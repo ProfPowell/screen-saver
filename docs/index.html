@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Saver - Retro Web Component</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">&lt;screen-saver&gt;</div>
+    <div class="links">
+      <a href="index.html" class="active">Home</a>
+      <a href="demos.html">Demos</a>
+      <a href="api.html">API</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <h1>&lt;screen-saver&gt;</h1>
+      <p>A vanilla JavaScript web component that displays retro screen saver effects after idle timeout. Bring back the nostalgia!</p>
+      <div class="btn-group">
+        <button class="btn" id="activateBtn">Activate Now</button>
+        <a href="demos.html" class="btn btn-secondary">View Demos</a>
+      </div>
+    </div>
+
+    <h2>Features</h2>
+    <ul class="feature-list">
+      <li>Zero dependencies - pure vanilla JavaScript</li>
+      <li>Three built-in effects: bounce3d, matrix, ascii-glitch</li>
+      <li>Automatic idle detection with configurable timeout</li>
+      <li>Custom effect registration API</li>
+      <li>Full CSS custom property support</li>
+      <li>Respects prefers-reduced-motion</li>
+      <li>TypeScript definitions included</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre><code>&lt;!-- Add to your HTML --&gt;
+&lt;script type="module" src="screen-saver.js"&gt;&lt;/script&gt;
+
+&lt;screen-saver timeout="180" effect="bounce3d"&gt;
+  Your Text Here
+&lt;/screen-saver&gt;</code></pre>
+
+    <h2>Installation</h2>
+    <div class="card">
+      <h3>npm</h3>
+      <pre><code>npm install screen-saver</code></pre>
+    </div>
+
+    <div class="card">
+      <h3>CDN</h3>
+      <pre><code>&lt;script type="module" src="https://unpkg.com/screen-saver/dist/screen-saver.js"&gt;&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="card">
+      <h3>ES Module</h3>
+      <pre><code>import { ScreenSaver } from 'screen-saver';
+
+// Use programmatically
+const el = document.querySelector('screen-saver');
+el.activate();</code></pre>
+    </div>
+
+    <h2>Available Effects</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>bounce3d</h3>
+        <p>Classic bouncing 3D extruded text with color cycling on edge bounces. Features perspective rotation and layered text shadows.</p>
+      </div>
+      <div class="card">
+        <h3>matrix</h3>
+        <p>Matrix-style falling character rain with Japanese katakana and ASCII. Your text glows prominently in the center.</p>
+      </div>
+      <div class="card">
+        <h3>ascii-glitch</h3>
+        <p>Glitchy ASCII effect with random character corruption, chromatic aberration layers, and flicker effects.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Built with vanilla JavaScript. No dependencies.</p>
+  </footer>
+
+  <screen-saver id="screensaver" timeout="300" effect="bounce3d">Screen Saver!</screen-saver>
+
+  <script type="module">
+    import '../src/screen-saver.js';
+
+    document.getElementById('activateBtn').addEventListener('click', () => {
+      document.getElementById('screensaver').activate();
+    });
+  </script>
+</body>
+</html>

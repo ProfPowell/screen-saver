@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Saver Test Harness</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 2px solid #333;
+      background: #fff;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    .status {
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+      margin-bottom: 2rem;
+    }
+    .log {
+      padding: 1rem;
+      background: #1e1e1e;
+      color: #0f0;
+      font-family: monospace;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      margin: 0.25rem 0;
+    }
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Screen Saver Test Harness</h1>
+
+  <div class="status" id="status">
+    Status: <span id="isActive">Inactive</span>
+  </div>
+
+  <div class="controls">
+    <button id="activate">Activate Now</button>
+    <button id="deactivate">Deactivate</button>
+    <select id="effect">
+      <option value="bounce3d">bounce3d</option>
+      <option value="matrix">matrix</option>
+      <option value="ascii-glitch">ascii-glitch</option>
+    </select>
+    <button id="changeText">Change Text</button>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <screen-saver id="screensaver" timeout="5" effect="bounce3d">Test Text</screen-saver>
+
+  <script type="module">
+    import '../src/screen-saver.js';
+
+    const screensaver = document.getElementById('screensaver');
+    const statusEl = document.getElementById('isActive');
+    const logEl = document.getElementById('log');
+    const effectSelect = document.getElementById('effect');
+
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function updateStatus() {
+      statusEl.textContent = screensaver.isActive ? 'Active' : 'Inactive';
+    }
+
+    screensaver.addEventListener('screensaver-activate', () => {
+      log('Event: screensaver-activate');
+      updateStatus();
+    });
+
+    screensaver.addEventListener('screensaver-deactivate', (e) => {
+      log(`Event: screensaver-deactivate (duration: ${e.detail.duration}ms)`);
+      updateStatus();
+    });
+
+    document.getElementById('activate').addEventListener('click', () => {
+      log('Manual activation');
+      screensaver.activate();
+    });
+
+    document.getElementById('deactivate').addEventListener('click', () => {
+      log('Manual deactivation');
+      screensaver.deactivate();
+    });
+
+    effectSelect.addEventListener('change', () => {
+      screensaver.effect = effectSelect.value;
+      log(`Effect changed to: ${effectSelect.value}`);
+    });
+
+    document.getElementById('changeText').addEventListener('click', () => {
+      const texts = ['Hello World!', 'Screen Saver', 'Retro Vibes', 'Whoa!', 'Testing 123'];
+      const newText = texts[Math.floor(Math.random() * texts.length)];
+      screensaver.textContent = newText;
+      log(`Text changed to: ${newText}`);
+    });
+
+    log('Test harness initialized');
+    log(`Timeout: ${screensaver.timeout}s`);
+    log(`Effect: ${screensaver.effect}`);
+  </script>
+</body>
+</html>

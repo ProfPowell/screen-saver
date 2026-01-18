@@ -1,4 +1,4 @@
-class r {
+class l {
   /**
    * @param {HTMLElement} container - The container element to render into
    * @param {string} text - The text to display
@@ -20,7 +20,7 @@ class r {
     this.stop(), this.container.innerHTML = "";
   }
 }
-class c extends r {
+class m extends l {
   constructor(t, e, s) {
     super(t, e, s), this.x = 0, this.y = 0, this.vx = 2, this.vy = 1.5, this.rotation = 0, this.rotationSpeed = 0.5, this.lastTime = 0, this.colors = [
       "#ff0000",
@@ -54,8 +54,10 @@ class c extends r {
       this.textElement.style.left = "50%", this.textElement.style.top = "50%", this.textElement.style.transform = "translate(-50%, -50%)", this.updateExtrusion();
       return;
     }
-    const e = this.container.getBoundingClientRect();
-    this.x = Math.random() * (e.width - 200), this.y = Math.random() * (e.height - 100), this.lastTime = performance.now(), this.animate();
+    requestAnimationFrame(() => {
+      const e = this.container.getBoundingClientRect(), s = e.width || window.innerWidth, i = e.height || window.innerHeight;
+      this.x = Math.random() * Math.max(0, s - 300), this.y = Math.random() * Math.max(0, i - 100), this.lastTime = performance.now(), this.animate();
+    });
   }
   updateExtrusion() {
     const t = this.colors[this.colorIndex], e = this.getExtrudeColor(t), s = [];
@@ -70,13 +72,13 @@ class c extends r {
   animate() {
     const t = performance.now(), e = (t - this.lastTime) / 16.67;
     this.lastTime = t;
-    const s = this.container.getBoundingClientRect(), i = this.textElement.getBoundingClientRect();
+    const s = this.container.getBoundingClientRect(), i = this.textElement.getBoundingClientRect(), n = s.width || window.innerWidth, o = s.height || window.innerHeight, r = i.width || 200, h = i.height || 80;
     this.x += this.vx * this.speed * e, this.y += this.vy * this.speed * e, this.rotation += this.rotationSpeed * this.speed * e;
-    let n = !1;
-    (this.x <= 0 || this.x + i.width >= s.width) && (this.vx *= -1, this.x = Math.max(0, Math.min(this.x, s.width - i.width)), n = !0), (this.y <= 0 || this.y + i.height >= s.height) && (this.vy *= -1, this.y = Math.max(0, Math.min(this.y, s.height - i.height)), n = !0), n && (this.colorIndex = (this.colorIndex + 1) % this.colors.length), this.textElement.style.left = `${this.x}px`, this.textElement.style.top = `${this.y}px`, this.textElement.style.transform = `rotateY(${Math.sin(this.rotation * 0.05) * 15}deg)`, this.updateExtrusion(), this.animationId = requestAnimationFrame(() => this.animate());
+    let c = !1;
+    (this.x <= 0 || this.x + r >= n) && (this.vx *= -1, this.x = Math.max(0, Math.min(this.x, n - r)), c = !0), (this.y <= 0 || this.y + h >= o) && (this.vy *= -1, this.y = Math.max(0, Math.min(this.y, o - h)), c = !0), c && (this.colorIndex = (this.colorIndex + 1) % this.colors.length), this.textElement.style.left = `${this.x}px`, this.textElement.style.top = `${this.y}px`, this.textElement.style.transform = `rotateY(${Math.sin(this.rotation * 0.05) * 15}deg)`, this.updateExtrusion(), this.animationId = requestAnimationFrame(() => this.animate());
   }
 }
-class m extends r {
+class f extends l {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.columns = [], this.fontSize = 16, this.lastTime = 0, this.chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   }
@@ -128,8 +130,8 @@ class m extends r {
     }
     this.lastTime = t, this.ctx.fillStyle = "rgba(0, 0, 0, 0.05)", this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height), this.ctx.fillStyle = "#00ff00", this.ctx.font = `${this.fontSize}px monospace`;
     for (let s = 0; s < this.columns.length; s++) {
-      const i = this.chars[Math.floor(Math.random() * this.chars.length)], n = s * this.fontSize, a = this.columns[s] * this.fontSize;
-      Math.random() > 0.9 ? this.ctx.fillStyle = "#ffffff" : this.ctx.fillStyle = "#00ff00", this.ctx.fillText(i, n, a), a > this.canvas.height && Math.random() > 0.975 && (this.columns[s] = 0), this.columns[s]++;
+      const i = this.chars[Math.floor(Math.random() * this.chars.length)], n = s * this.fontSize, o = this.columns[s] * this.fontSize;
+      Math.random() > 0.9 ? this.ctx.fillStyle = "#ffffff" : this.ctx.fillStyle = "#00ff00", this.ctx.fillText(i, n, o), o > this.canvas.height && Math.random() > 0.975 && (this.columns[s] = 0), this.columns[s]++;
     }
     this.animationId = requestAnimationFrame(() => this.animate());
   }
@@ -137,7 +139,7 @@ class m extends r {
     window.removeEventListener("resize", this.resize.bind(this)), super.destroy();
   }
 }
-class f extends r {
+class u extends l {
   constructor(t, e, s) {
     super(t, e, s), this.textElement = null, this.originalText = e, this.glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", this.lastTime = 0, this.glitchIntensity = 0, this.flickerTimeout = null;
   }
@@ -191,9 +193,9 @@ class f extends r {
     let s = "";
     for (let n = 0; n < this.originalText.length; n++)
       Math.random() < this.glitchIntensity ? s += this.glitchChars[Math.floor(Math.random() * this.glitchChars.length)] : s += this.originalText[n];
-    this.textElement.textContent = s, this.container.querySelectorAll(".glitch-layer").forEach((n, a) => {
-      const l = (Math.random() - 0.5) * this.glitchIntensity * 20, d = (Math.random() - 0.5) * this.glitchIntensity * 5;
-      n.style.transform = `translate(${l}px, ${d}px)`, n.textContent = s;
+    this.textElement.textContent = s, this.container.querySelectorAll(".glitch-layer").forEach((n, o) => {
+      const r = (Math.random() - 0.5) * this.glitchIntensity * 20, h = (Math.random() - 0.5) * this.glitchIntensity * 5;
+      n.style.transform = `translate(${r}px, ${h}px)`, n.textContent = s;
     }), Math.random() > 0.98 && (this.textElement.style.opacity = "0.5", clearTimeout(this.flickerTimeout), this.flickerTimeout = setTimeout(() => {
       this.textElement && (this.textElement.style.opacity = "1");
     }, 50)), this.animationId = requestAnimationFrame(() => this.animate());
@@ -202,12 +204,12 @@ class f extends r {
     clearTimeout(this.flickerTimeout), super.destroy();
   }
 }
-const h = /* @__PURE__ */ new Map([
-  ["bounce3d", c],
-  ["matrix", m],
-  ["ascii-glitch", f]
+const d = /* @__PURE__ */ new Map([
+  ["bounce3d", m],
+  ["matrix", f],
+  ["ascii-glitch", u]
 ]);
-class u extends HTMLElement {
+class p extends HTMLElement {
   static get observedAttributes() {
     return ["timeout", "effect", "speed", "background"];
   }
@@ -217,7 +219,7 @@ class u extends HTMLElement {
    * @param {typeof Effect} effectClass - Effect class extending Effect
    */
   static registerEffect(t, e) {
-    h.set(t, e);
+    d.set(t, e);
   }
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this._isActive = !1, this._idleTimer = null, this._activatedAt = null, this._effect = null, this._boundResetTimer = this._resetIdleTimer.bind(this), this._boundDismiss = this._handleDismiss.bind(this);
@@ -316,11 +318,11 @@ class u extends HTMLElement {
           height: 100%;
         }
 
-        ::slotted(*) {
+        .slot-container {
           display: none;
         }
       </style>
-      <slot></slot>
+      <div class="slot-container"><slot></slot></div>
       <div class="overlay" role="dialog" aria-label="Screen saver" aria-hidden="true">
         <div class="effect-container"></div>
       </div>
@@ -330,7 +332,7 @@ class u extends HTMLElement {
     return this.shadowRoot.querySelector("slot").assignedNodes({ flatten: !0 }).map((s) => s.textContent).join("").trim() || "Screen Saver";
   }
   _createEffect() {
-    const t = this.shadowRoot.querySelector(".effect-container"), e = h.get(this.effect) || c, s = this._getSlotText();
+    const t = this.shadowRoot.querySelector(".effect-container"), e = d.get(this.effect) || m, s = this._getSlotText();
     this._effect = new e(t, s, this.speed), this._effect.start();
   }
   _destroyEffect() {
@@ -371,13 +373,13 @@ class u extends HTMLElement {
     });
   }
 }
-customElements.define("screen-saver", u);
+customElements.define("screen-saver", p);
 export {
-  f as AsciiGlitchEffect,
-  c as Bounce3DEffect,
-  r as Effect,
-  m as MatrixEffect,
-  u as ScreenSaver,
-  u as default
+  u as AsciiGlitchEffect,
+  m as Bounce3DEffect,
+  l as Effect,
+  f as MatrixEffect,
+  p as ScreenSaver,
+  p as default
 };
 //# sourceMappingURL=screen-saver.js.map

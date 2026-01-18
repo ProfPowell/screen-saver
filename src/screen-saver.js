@@ -105,13 +105,18 @@ class Bounce3DEffect extends Effect {
       return;
     }
 
-    // Initialize position
-    const rect = this.container.getBoundingClientRect();
-    this.x = Math.random() * (rect.width - 200);
-    this.y = Math.random() * (rect.height - 100);
+    // Wait for next frame to ensure container is laid out
+    requestAnimationFrame(() => {
+      const rect = this.container.getBoundingClientRect();
+      // Initialize position with fallback for zero dimensions
+      const width = rect.width || window.innerWidth;
+      const height = rect.height || window.innerHeight;
+      this.x = Math.random() * Math.max(0, width - 300);
+      this.y = Math.random() * Math.max(0, height - 100);
 
-    this.lastTime = performance.now();
-    this.animate();
+      this.lastTime = performance.now();
+      this.animate();
+    });
   }
 
   updateExtrusion() {
@@ -147,6 +152,12 @@ class Bounce3DEffect extends Effect {
     const rect = this.container.getBoundingClientRect();
     const textRect = this.textElement.getBoundingClientRect();
 
+    // Use fallback dimensions if container not properly laid out
+    const containerWidth = rect.width || window.innerWidth;
+    const containerHeight = rect.height || window.innerHeight;
+    const textWidth = textRect.width || 200;
+    const textHeight = textRect.height || 80;
+
     // Update position
     this.x += this.vx * this.speed * deltaTime;
     this.y += this.vy * this.speed * deltaTime;
@@ -156,14 +167,14 @@ class Bounce3DEffect extends Effect {
 
     // Bounce off edges
     let bounced = false;
-    if (this.x <= 0 || this.x + textRect.width >= rect.width) {
+    if (this.x <= 0 || this.x + textWidth >= containerWidth) {
       this.vx *= -1;
-      this.x = Math.max(0, Math.min(this.x, rect.width - textRect.width));
+      this.x = Math.max(0, Math.min(this.x, containerWidth - textWidth));
       bounced = true;
     }
-    if (this.y <= 0 || this.y + textRect.height >= rect.height) {
+    if (this.y <= 0 || this.y + textHeight >= containerHeight) {
       this.vy *= -1;
-      this.y = Math.max(0, Math.min(this.y, rect.height - textRect.height));
+      this.y = Math.max(0, Math.min(this.y, containerHeight - textHeight));
       bounced = true;
     }
 
@@ -661,11 +672,11 @@ class ScreenSaver extends HTMLElement {
           height: 100%;
         }
 
-        ::slotted(*) {
+        .slot-container {
           display: none;
         }
       </style>
-      <slot></slot>
+      <div class="slot-container"><slot></slot></div>
       <div class="overlay" role="dialog" aria-label="Screen saver" aria-hidden="true">
         <div class="effect-container"></div>
       </div>

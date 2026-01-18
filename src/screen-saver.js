@@ -758,12 +758,18 @@ class ScreenSaver extends HTMLElement {
   }
 
   _handleDismiss(event) {
-    // Small delay to ensure the event wasn't the activation event
-    requestAnimationFrame(() => {
-      if (this._isActive) {
-        this.deactivate();
-      }
-    });
+    // Grace period of 500ms after activation to prevent immediate dismissal
+    // from the same mouse movement that triggered activation
+    const timeSinceActivation = Date.now() - this._activatedAt;
+    if (timeSinceActivation < 500) {
+      // Re-attach listeners since we're ignoring this event
+      this._attachDismissListeners();
+      return;
+    }
+
+    if (this._isActive) {
+      this.deactivate();
+    }
   }
 }
 

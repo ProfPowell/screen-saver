@@ -86,7 +86,8 @@ test.describe('ScreenSaver Component', () => {
 
     test('should deactivate on mouse move', async ({ page }) => {
       await page.click('#activate');
-      await page.waitForTimeout(100);
+      // Wait past the 500ms grace period
+      await page.waitForTimeout(600);
 
       // Move mouse to trigger deactivation
       await page.mouse.move(100, 100);
@@ -100,7 +101,8 @@ test.describe('ScreenSaver Component', () => {
 
     test('should deactivate on keypress', async ({ page }) => {
       await page.click('#activate');
-      await page.waitForTimeout(100);
+      // Wait past the 500ms grace period
+      await page.waitForTimeout(600);
 
       await page.keyboard.press('Escape');
       await page.waitForTimeout(100);

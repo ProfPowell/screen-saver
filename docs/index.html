@@ -38,31 +38,33 @@
     </ul>
 
     <h2>Quick Start</h2>
-    <pre><code>&lt;!-- Add to your HTML --&gt;
-&lt;script type="module" src="screen-saver.js"&gt;&lt;/script&gt;
+    <code-block language="html" theme="dark" label="Add to your HTML">
+<!-- Add to your HTML -->
+<script type="module" src="screen-saver.js"></script>
 
-&lt;screen-saver timeout="180" effect="bounce3d"&gt;
+<screen-saver timeout="180" effect="bounce3d">
   Your Text Here
-&lt;/screen-saver&gt;</code></pre>
+</screen-saver>
+    </code-block>
 
     <h2>Installation</h2>
     <div class="card">
       <h3>npm</h3>
-      <pre><code>npm install screen-saver</code></pre>
+      <code-block language="bash" theme="dark">npm install screen-saver</code-block>
     </div>
 
     <div class="card">
       <h3>CDN</h3>
-      <pre><code>&lt;script type="module" src="https://unpkg.com/screen-saver/dist/screen-saver.js"&gt;&lt;/script&gt;</code></pre>
+      <code-block language="html" theme="dark"><script type="module" src="https://unpkg.com/screen-saver/dist/screen-saver.js"></script></code-block>
     </div>
 
     <div class="card">
       <h3>ES Module</h3>
-      <pre><code>import { ScreenSaver } from 'screen-saver';
+      <code-block language="javascript" theme="dark">import { ScreenSaver } from 'screen-saver';
 
 // Use programmatically
 const el = document.querySelector('screen-saver');
-el.activate();</code></pre>
+el.activate();</code-block>
     </div>
 
     <h2>Available Effects</h2>
@@ -90,6 +92,7 @@ el.activate();</code></pre>
 
   <script type="module">
     import './screen-saver.js';
+    import './code-block.js';
 
     document.getElementById('activateBtn').addEventListener('click', () => {
       document.getElementById('screensaver').activate();

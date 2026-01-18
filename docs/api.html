@@ -20,9 +20,9 @@
     <h1>API Documentation</h1>
 
     <h2>Basic Usage</h2>
-    <pre><code>&lt;screen-saver timeout="180" effect="bounce3d"&gt;
+    <code-block language="html" theme="dark"><screen-saver timeout="180" effect="bounce3d">
   Your Text Here
-&lt;/screen-saver&gt;</code></pre>
+</screen-saver></code-block>
 
     <h2>Attributes</h2>
     <table>
@@ -104,20 +104,20 @@
     <div class="card">
       <h3>activate()</h3>
       <p>Programmatically activate the screen saver.</p>
-      <pre><code>const el = document.querySelector('screen-saver');
-el.activate();</code></pre>
+      <code-block language="javascript" theme="dark">const el = document.querySelector('screen-saver');
+el.activate();</code-block>
     </div>
 
     <div class="card">
       <h3>deactivate()</h3>
       <p>Programmatically deactivate the screen saver.</p>
-      <pre><code>el.deactivate();</code></pre>
+      <code-block language="javascript" theme="dark">el.deactivate();</code-block>
     </div>
 
     <div class="card">
       <h3>ScreenSaver.registerEffect(name, effectClass)</h3>
       <p>Register a custom effect.</p>
-      <pre><code>import { ScreenSaver, Effect } from 'screen-saver';
+      <code-block language="javascript" theme="dark" show-lines>import { ScreenSaver, Effect } from 'screen-saver';
 
 class MyEffect extends Effect {
   start() {
@@ -138,24 +138,24 @@ class MyEffect extends Effect {
   }
 }
 
-ScreenSaver.registerEffect('my-effect', MyEffect);</code></pre>
+ScreenSaver.registerEffect('my-effect', MyEffect);</code-block>
     </div>
 
     <h2>Events</h2>
     <div class="card">
       <h3>screensaver-activate</h3>
       <p>Fired when the screen saver activates.</p>
-      <pre><code>el.addEventListener('screensaver-activate', () => {
+      <code-block language="javascript" theme="dark">el.addEventListener('screensaver-activate', () => {
   console.log('Screen saver started');
-});</code></pre>
+});</code-block>
     </div>
 
     <div class="card">
       <h3>screensaver-deactivate</h3>
       <p>Fired when the screen saver dismisses. Includes duration in milliseconds.</p>
-      <pre><code>el.addEventListener('screensaver-deactivate', (e) => {
+      <code-block language="javascript" theme="dark">el.addEventListener('screensaver-deactivate', (e) => {
   console.log(`Active for ${e.detail.duration}ms`);
-});</code></pre>
+});</code-block>
     </div>
 
     <h2>CSS Custom Properties</h2>
@@ -218,7 +218,7 @@ ScreenSaver.registerEffect('my-effect', MyEffect);</code></pre>
     </div>
 
     <h2>TypeScript</h2>
-    <pre><code>import { ScreenSaver, Effect } from 'screen-saver';
+    <code-block language="typescript" theme="dark" show-lines>import { ScreenSaver, Effect } from 'screen-saver';
 
 // Element is typed
 const el = document.querySelector('screen-saver') as ScreenSaver;
@@ -230,7 +230,7 @@ el.effect = 'matrix';
 // Events are typed
 el.addEventListener('screensaver-deactivate', (e: CustomEvent<{ duration: number }>) => {
   console.log(e.detail.duration);
-});</code></pre>
+});</code-block>
 
     <h2>Built-in Effects</h2>
 
@@ -271,5 +271,9 @@ el.addEventListener('screensaver-deactivate', (e: CustomEvent<{ duration: number
   <footer>
     <p>Built with vanilla JavaScript. No dependencies.</p>
   </footer>
+
+  <script type="module">
+    import './code-block.js';
+  </script>
 </body>
 </html>

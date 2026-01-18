@@ -100,13 +100,13 @@
     <h2>CSS Customization</h2>
     <div class="card">
       <p>Customize the look with CSS custom properties:</p>
-      <pre><code>screen-saver {
+      <code-block language="css" theme="dark">screen-saver {
   --screen-saver-bg: rgba(0, 0, 0, 0.95);
   --screen-saver-text-color: #00ff00;
   --screen-saver-font-family: 'Arial Black', sans-serif;
   --screen-saver-font-size: 4rem;
   --screen-saver-z-index: 999999;
-}</code></pre>
+}</code-block>
     </div>
 
     <h2>Reduced Motion</h2>
@@ -124,6 +124,7 @@
 
   <script type="module">
     import './screen-saver.js';
+    import './code-block.js';
 
     const screensaver = document.getElementById('screensaver');
     const effectSelect = document.getElementById('effectSelect');

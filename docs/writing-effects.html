@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing Effects - Screen Saver</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">&lt;screen-saver&gt;</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="demos.html">Demos</a>
+      <a href="api.html">API</a>
+      <a href="writing-effects.html" class="active">Writing Effects</a>
+    </div>
+  </nav>
+
+  <main>
+    <h1>Writing Custom Effects</h1>
+    <p>This guide explains how to create custom effects for the <code>&lt;screen-saver&gt;</code> web component.</p>
+
+    <h2>Effect Architecture</h2>
+    <div class="card">
+      <p>All effects extend the base <code>Effect</code> class. The base class provides:</p>
+      <ul class="feature-list">
+        <li>Container element reference</li>
+        <li>Text content from the slot (or null if not required)</li>
+        <li>Speed multiplier</li>
+        <li>Reduced motion detection</li>
+        <li>Animation frame management</li>
+      </ul>
+    </div>
+
+    <h2>Basic Effect Structure</h2>
+    <code-block language="javascript" theme="dark" show-lines>import { Effect } from '../effect.js';
+
+class MyEffect extends Effect {
+  static requiresText = true; // Set to false if effect doesn't need text
+
+  constructor(container, text, speed) {
+    super(container, text, speed);
+    // Initialize effect-specific properties
+    this.canvas = null;
+    this.ctx = null;
+  }
+
+  start() {
+    // Set up DOM elements, canvas, styles
+    this.setupCanvas();
+    this.setupStyles();
+
+    // Check for reduced motion preference
+    if (this.reducedMotion) {
+      this.drawStaticFrame();
+      return;
+    }
+
+    // Start animation loop
+    this.animate();
+  }
+
+  animate() {
+    // Update and render frame
+    this.update();
+    this.draw();
+
+    // Continue animation loop
+    this.animationId = requestAnimationFrame(() =&gt; this.animate());
+  }
+
+  destroy() {
+    // Clean up (base class cancels animationId)
+    super.destroy();
+  }
+
+  updateText(text) {
+    // Handle live text updates
+    super.updateText(text);
+    // Update any text elements
+  }
+}
+
+export { MyEffect };</code-block>
+
+    <h2>Required Methods</h2>
+    <div class="card">
+      <h3>start()</h3>
+      <p>Called when the screen saver activates. Set up all DOM elements, styles, and start animations here.</p>
+    </div>
+
+    <div class="card">
+      <h3>destroy()</h3>
+      <p>Called when the screen saver deactivates. Clean up event listeners, intervals, and DOM elements. Always call <code>super.destroy()</code> to cancel the animation frame.</p>
+    </div>
+
+    <div class="card">
+      <h3>updateText(text) <span style="opacity: 0.6">(optional)</span></h3>
+      <p>Called when slot content changes while active. Implement this to support live text updates.</p>
+    </div>
+
+    <h2>The Base Effect Class</h2>
+    <code-block language="javascript" theme="dark" show-lines>class Effect {
+  static requiresText = true; // Override in subclass
+
+  constructor(container, text, speed) {
+    this.container = container;  // DOM element to render into
+    this.text = text;            // Text from slot (null if not required)
+    this.speed = speed;          // Speed multiplier (default 1)
+    this.animationId = null;     // For requestAnimationFrame
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  start() { /* Override this */ }
+
+  destroy() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+    this.container.innerHTML = '';
+  }
+
+  updateText(text) {
+    this.text = text;
+  }
+}</code-block>
+
+    <h2>Text Requirements</h2>
+    <div class="card">
+      <p>Effects declare whether they require text via the static <code>requiresText</code> property:</p>
+      <code-block language="javascript" theme="dark">class StarfieldEffect extends Effect {
+  static requiresText = false; // Effect works without text
+
+  start() {
+    // Only create text overlay if text was provided
+    if (this.text) {
+      this.createTextOverlay();
+    }
+    this.animate();
+  }
+}</code-block>
+      <p style="margin-top: 1rem;">When <code>requiresText = true</code> (default) and no text is provided, the component defaults to the site's domain name. When <code>requiresText = false</code> and no text is provided, <code>this.text</code> will be <code>null</code>.</p>
+    </div>
+
+    <h2>Animation Patterns</h2>
+
+    <div class="card">
+      <h3>Delta-Time Normalization</h3>
+      <p>For smooth animations at any frame rate, normalize updates to 60fps:</p>
+      <code-block language="javascript" theme="dark">animate() {
+  const currentTime = performance.now();
+  const deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
+  this.lastTime = currentTime;
+
+  // Use deltaTime and this.speed for movement
+  this.x += this.velocityX * deltaTime * this.speed;
+  this.y += this.velocityY * deltaTime * this.speed;
+
+  this.draw();
+  this.animationId = requestAnimationFrame(() =&gt; this.animate());
+}</code-block>
+    </div>
+
+    <div class="card">
+      <h3>Respecting Reduced Motion</h3>
+      <p>Always check <code>this.reducedMotion</code> and provide a static fallback:</p>
+      <code-block language="javascript" theme="dark">start() {
+  this.setupElements();
+
+  if (this.reducedMotion) {
+    // Show static centered text instead of animation
+    this.showStaticText();
+    return;
+  }
+
+  this.animate();
+}</code-block>
+    </div>
+
+    <h2>Adding External Dependencies</h2>
+    <div class="card">
+      <p>For effects that need external libraries (like Three.js), load them dynamically:</p>
+      <code-block language="javascript" theme="dark" show-lines>class TunnelEffect extends Effect {
+  async start() {
+    // Show loading indicator
+    this.showLoading();
+
+    try {
+      // Dynamic import from CDN
+      const THREE_CDN = 'https://unpkg.com/three@0.160.0/build/three.module.js';
+      this.THREE = await import(/* webpackIgnore: true */ THREE_CDN);
+
+      // Now use THREE to set up the scene
+      this.setupScene();
+      this.animate();
+    } catch (error) {
+      console.error('Failed to load Three.js:', error);
+      this.showFallback();
+    }
+  }
+}</code-block>
+      <p style="margin-top: 1rem;">The <code>/* webpackIgnore: true */</code> comment prevents bundlers from trying to resolve the URL at build time.</p>
+    </div>
+
+    <h2>Configuration via Data Attributes</h2>
+    <div class="card">
+      <p>Effects can read configuration from the <code>&lt;screen-saver&gt;</code> element:</p>
+      <code-block language="javascript" theme="dark">parseConfig() {
+  // Find the screen-saver parent element
+  const screenSaver = this.container.closest('screen-saver') ||
+                      this.container.getRootNode()?.host;
+
+  if (screenSaver) {
+    // Read data attributes
+    const count = screenSaver.getAttribute('data-snowflakes');
+    if (count) this.snowflakeCount = parseInt(count, 10);
+
+    const wind = screenSaver.getAttribute('data-wind');
+    if (wind) this.windFactor = parseFloat(wind);
+
+    this.backgroundUrl = screenSaver.getAttribute('data-background');
+  }
+}</code-block>
+
+      <p style="margin-top: 1rem;">Usage in HTML:</p>
+      <code-block language="html" theme="dark">&lt;screen-saver effect="snow"
+  data-snowflakes="300"
+  data-wind="0.5"
+  data-background="winter-cabin.jpg"&gt;
+  Let it Snow
+&lt;/screen-saver&gt;</code-block>
+    </div>
+
+    <h2>Scene Composition</h2>
+    <div class="card">
+      <p>For complex effects with multiple layers, create separate DOM elements:</p>
+      <code-block language="javascript" theme="dark" show-lines>start() {
+  // Background layer
+  this.backgroundLayer = document.createElement('div');
+  this.backgroundLayer.className = 'my-effect-bg';
+  this.container.appendChild(this.backgroundLayer);
+
+  // Canvas layer for animation
+  this.canvas = document.createElement('canvas');
+  this.canvas.className = 'my-effect-canvas';
+  this.container.appendChild(this.canvas);
+
+  // Text overlay layer (only if text provided)
+  if (this.text) {
+    this.textOverlay = document.createElement('div');
+    this.textOverlay.className = 'my-effect-text';
+    this.textOverlay.textContent = this.text;
+    this.container.appendChild(this.textOverlay);
+  }
+
+  // Add styles for layering
+  const style = document.createElement('style');
+  style.textContent = `
+    .my-effect-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .my-effect-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .my-effect-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+  `;
+  this.container.appendChild(style);
+}</code-block>
+    </div>
+
+    <h2>Registering Your Effect</h2>
+    <div class="card">
+      <h3>Built-in Registration</h3>
+      <p>Add your effect to the registry:</p>
+      <code-block language="javascript" theme="dark">// In src/effects/index.js
+import { MyEffect } from './my-effect.js';
+
+const defaultEffects = {
+  // ... existing effects
+  'my-effect': MyEffect,
+};
+
+export { MyEffect, defaultEffects };</code-block>
+    </div>
+
+    <div class="card">
+      <h3>Runtime Registration</h3>
+      <p>Or register at runtime:</p>
+      <code-block language="javascript" theme="dark">import { ScreenSaver } from 'screen-saver';
+import { MyEffect } from './my-effect.js';
+
+ScreenSaver.registerEffect('my-effect', MyEffect);</code-block>
+    </div>
+
+    <h2>Example Effects</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Starfield</h3>
+        <p>Simple canvas effect - classic flying-through-space using canvas 2D.</p>
+        <p><code>src/effects/starfield.js</code></p>
+      </div>
+      <div class="card">
+        <h3>Tunnel</h3>
+        <p>External library - Three.js integration with dynamic CDN loading.</p>
+        <p><code>src/effects/tunnel.js</code></p>
+      </div>
+      <div class="card">
+        <h3>Slideshow</h3>
+        <p>Configurable images - Ken Burns crossfade with <code>data-images</code> configuration.</p>
+        <p><code>src/effects/slideshow.js</code></p>
+      </div>
+      <div class="card">
+        <h3>Snow</h3>
+        <p>Scene composition - Multi-layer parallax with configurable background.</p>
+        <p><code>src/effects/snow.js</code></p>
+      </div>
+    </div>
+
+    <h2>Best Practices</h2>
+    <div class="card">
+      <ol class="feature-list" style="list-style: decimal; padding-left: 1.5rem;">
+        <li><strong>Always handle reduced motion</strong> - Provide a static fallback for users who prefer reduced motion.</li>
+        <li><strong>Clean up properly</strong> - Remove event listeners, clear intervals, and call <code>super.destroy()</code>.</li>
+        <li><strong>Use delta-time</strong> - Normalize animations to frame rate for consistent speed across devices.</li>
+        <li><strong>Handle resize</strong> - If using canvas, add a resize handler and remove it in <code>destroy()</code>.</li>
+        <li><strong>Respect the speed attribute</strong> - Multiply velocities by <code>this.speed</code> for user control.</li>
+        <li><strong>Support text updates</strong> - Implement <code>updateText()</code> for live slot content changes.</li>
+        <li><strong>Use CSS custom properties</strong> - Read from <code>--screen-saver-*</code> properties for theming.</li>
+        <li><strong>Lazy load heavy dependencies</strong> - Use dynamic imports for large libraries.</li>
+        <li><strong>Document data attributes</strong> - If your effect accepts configuration, document it.</li>
+        <li><strong>Test with all effects</strong> - Ensure switching between effects works cleanly.</li>
+      </ol>
+    </div>
+
+    <h2>CSS Custom Properties</h2>
+    <div class="card">
+      <p>Read theme values from CSS custom properties:</p>
+      <code-block language="javascript" theme="dark">const styles = getComputedStyle(this.container);
+const textColor = styles.getPropertyValue('--screen-saver-text-color') || '#ffffff';
+const fontFamily = styles.getPropertyValue('--screen-saver-font-family') || 'Arial Black';
+const fontSize = styles.getPropertyValue('--screen-saver-font-size') || '4rem';</code-block>
+    </div>
+  </main>
+
+  <footer>
+    <p>Built with vanilla JavaScript. No dependencies.</p>
+  </footer>
+
+  <script type="module">
+    import './code-block.js';
+  </script>
+</body>
+</html>

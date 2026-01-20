@@ -249,7 +249,7 @@ th {
 }
 
 .feature-list li::before {
-  content: '>';
+  content: '*';
   color: var(--primary-color);
   font-weight: bold;
 }

@@ -237,9 +237,9 @@
       screensaver.effect = effectSelect.value;
     });
 
-    // Update text
+    // Update text (empty text triggers effect-specific defaults)
     textInput.addEventListener('input', () => {
-      screensaver.textContent = textInput.value || 'Screen Saver';
+      screensaver.textContent = textInput.value;
     });
 
     // Update speed

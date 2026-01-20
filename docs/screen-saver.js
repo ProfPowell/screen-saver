@@ -1,14 +1,17 @@
-function M() {
+var D = Object.defineProperty;
+var N = (o, t, e) => t in o ? D(o, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : o[t] = e;
+var d = (o, t, e) => N(o, typeof t != "symbol" ? t + "" : t, e);
+function $() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 class c {
   /**
    * @param {HTMLElement} container - The container element to render into
-   * @param {string} text - The text to display
+   * @param {string|null} text - The text to display (null if not required)
    * @param {number} speed - Animation speed multiplier
    */
   constructor(t, e, s) {
-    this.container = t, this.text = e, this.speed = s, this.animationId = null, this.reducedMotion = M();
+    this.container = t, this.text = e, this.speed = s, this.animationId = null, this.reducedMotion = $();
   }
   /** Start the effect animation */
   start() {
@@ -30,14 +33,21 @@ class c {
     this.text = t;
   }
 }
-function u(h, t) {
-  return (h - t) / 16.67;
+/**
+ * Whether this effect requires text to be displayed.
+ * If true and no text is provided, defaults to the site's domain name.
+ * If false, the effect runs without text overlay.
+ * @type {boolean}
+ */
+d(c, "requiresText", !0);
+function p(o, t) {
+  return (o - t) / 16.67;
 }
-function C(h, t) {
+function T(o, t) {
   const e = 1e3 / t;
-  return h < e;
+  return o < e;
 }
-const z = [
+const q = [
   "#ff0000",
   "#ff7f00",
   "#ffff00",
@@ -49,9 +59,9 @@ const z = [
   "#ff00ff",
   "#00ff7f"
 ];
-class E extends c {
+class S extends c {
   constructor(t, e, s) {
-    super(t, e, s), this.x = 0, this.y = 0, this.vx = 2, this.vy = 1.5, this.rotation = 0, this.rotationSpeed = 0.5, this.lastTime = 0, this.colors = z, this.colorIndex = 0, this.textElement = null;
+    super(t, e, s), this.x = 0, this.y = 0, this.vx = 2, this.vy = 1.5, this.rotation = 0, this.rotationSpeed = 0.5, this.lastTime = 0, this.colors = q, this.colorIndex = 0, this.textElement = null;
   }
   start() {
     this.textElement = document.createElement("div"), this.textElement.className = "bounce3d-text", this.textElement.textContent = this.text, this.container.appendChild(this.textElement);
@@ -91,18 +101,18 @@ class E extends c {
     return `rgb(${s}, ${i}, ${n})`;
   }
   animate() {
-    const t = performance.now(), e = u(t, this.lastTime);
+    const t = performance.now(), e = p(t, this.lastTime);
     this.lastTime = t;
-    const s = this.container.getBoundingClientRect(), i = this.textElement.getBoundingClientRect(), n = s.width || window.innerWidth, a = s.height || window.innerHeight, r = i.width || 200, o = i.height || 80;
+    const s = this.container.getBoundingClientRect(), i = this.textElement.getBoundingClientRect(), n = s.width || window.innerWidth, a = s.height || window.innerHeight, r = i.width || 200, h = i.height || 80;
     this.x += this.vx * this.speed * e, this.y += this.vy * this.speed * e, this.rotation += this.rotationSpeed * this.speed * e;
     let l = !1;
-    (this.x <= 0 || this.x + r >= n) && (this.vx *= -1, this.x = Math.max(0, Math.min(this.x, n - r)), l = !0), (this.y <= 0 || this.y + o >= a) && (this.vy *= -1, this.y = Math.max(0, Math.min(this.y, a - o)), l = !0), l && (this.colorIndex = (this.colorIndex + 1) % this.colors.length), this.textElement.style.left = `${this.x}px`, this.textElement.style.top = `${this.y}px`, this.textElement.style.transform = `rotateY(${Math.sin(this.rotation * 0.05) * 15}deg)`, this.updateExtrusion(), this.animationId = requestAnimationFrame(() => this.animate());
+    (this.x <= 0 || this.x + r >= n) && (this.vx *= -1, this.x = Math.max(0, Math.min(this.x, n - r)), l = !0), (this.y <= 0 || this.y + h >= a) && (this.vy *= -1, this.y = Math.max(0, Math.min(this.y, a - h)), l = !0), l && (this.colorIndex = (this.colorIndex + 1) % this.colors.length), this.textElement.style.left = `${this.x}px`, this.textElement.style.top = `${this.y}px`, this.textElement.style.transform = `rotateY(${Math.sin(this.rotation * 0.05) * 15}deg)`, this.updateExtrusion(), this.animationId = requestAnimationFrame(() => this.animate());
   }
 }
-const _ = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-class k extends c {
+const F = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+class W extends c {
   constructor(t, e, s) {
-    super(t, e, s), this.canvas = null, this.ctx = null, this.columns = [], this.fontSize = 16, this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.chars = _;
+    super(t, e, s), this.canvas = null, this.ctx = null, this.columns = [], this.fontSize = 16, this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.chars = F;
   }
   start() {
     this.canvas = document.createElement("canvas"), this.canvas.className = "matrix-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "matrix-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
@@ -144,7 +154,7 @@ class k extends c {
   }
   animate() {
     const t = performance.now(), e = t - this.lastTime;
-    if (C(e, 30 * this.speed)) {
+    if (T(e, 30 * this.speed)) {
       this.animationId = requestAnimationFrame(() => this.animate());
       return;
     }
@@ -162,10 +172,10 @@ class k extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const I = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-class R extends c {
+const G = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+class H extends c {
   constructor(t, e, s) {
-    super(t, e, s), this.textElement = null, this.originalText = e, this.glitchChars = I, this.lastTime = 0, this.glitchIntensity = 0, this.flickerTimeout = null;
+    super(t, e, s), this.textElement = null, this.originalText = e, this.glitchChars = G, this.lastTime = 0, this.glitchIntensity = 0, this.flickerTimeout = null;
   }
   start() {
     const t = document.createElement("div");
@@ -209,7 +219,7 @@ class R extends c {
   }
   animate() {
     const t = performance.now(), e = t - this.lastTime;
-    if (C(e, 20 * this.speed)) {
+    if (T(e, 20 * this.speed)) {
       this.animationId = requestAnimationFrame(() => this.animate());
       return;
     }
@@ -218,8 +228,8 @@ class R extends c {
     for (let n = 0; n < this.originalText.length; n++)
       Math.random() < this.glitchIntensity ? s += this.glitchChars[Math.floor(Math.random() * this.glitchChars.length)] : s += this.originalText[n];
     this.textElement.textContent = s, this.container.querySelectorAll(".glitch-layer").forEach((n, a) => {
-      const r = (Math.random() - 0.5) * this.glitchIntensity * 20, o = (Math.random() - 0.5) * this.glitchIntensity * 5;
-      n.style.transform = `translate(${r}px, ${o}px)`, n.textContent = s;
+      const r = (Math.random() - 0.5) * this.glitchIntensity * 20, h = (Math.random() - 0.5) * this.glitchIntensity * 5;
+      n.style.transform = `translate(${r}px, ${h}px)`, n.textContent = s;
     }), Math.random() > 0.98 && (this.textElement.style.opacity = "0.5", clearTimeout(this.flickerTimeout), this.flickerTimeout = setTimeout(() => {
       this.textElement && (this.textElement.style.opacity = "1");
     }, 50)), this.animationId = requestAnimationFrame(() => this.animate());
@@ -233,13 +243,13 @@ class R extends c {
     });
   }
 }
-const O = 200;
-class A extends c {
+const U = 200;
+class M extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.stars = [], this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.centerX = 0, this.centerY = 0;
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "starfield-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "starfield-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "starfield-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "starfield-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .starfield-canvas {
@@ -270,7 +280,7 @@ class A extends c {
   }
   initStars() {
     this.stars = [];
-    for (let t = 0; t < O; t++)
+    for (let t = 0; t < U; t++)
       this.stars.push(this.createStar());
   }
   createStar() {
@@ -305,11 +315,11 @@ class A extends c {
         this.stars[i] = this.createStar(), this.stars[i].z = 1e3;
         continue;
       }
-      const a = 500 / n.z, r = this.centerX + n.x * a, o = this.centerY + n.y * a, l = 500 / n.prevZ, f = this.centerX + n.x * l, d = this.centerY + n.y * l;
-      if (r < 0 || r > this.canvas.width || o < 0 || o > this.canvas.height)
+      const a = 500 / n.z, r = this.centerX + n.x * a, h = this.centerY + n.y * a, l = 500 / n.prevZ, m = this.centerX + n.x * l, f = this.centerY + n.y * l;
+      if (r < 0 || r > this.canvas.width || h < 0 || h > this.canvas.height)
         continue;
-      const m = Math.min(255, Math.floor((1e3 - n.z) / 1e3 * 255)), p = Math.max(0.5, (1e3 - n.z) / 500 * 2);
-      this.ctx.beginPath(), this.ctx.moveTo(f, d), this.ctx.lineTo(r, o), this.ctx.strokeStyle = `rgba(${m}, ${m}, ${Math.min(255, m + 50)}, 0.8)`, this.ctx.lineWidth = p, this.ctx.stroke(), this.ctx.beginPath(), this.ctx.arc(r, o, p * 1.5, 0, Math.PI * 2), this.ctx.fillStyle = `rgb(${m}, ${m}, ${Math.min(255, m + 50)})`, this.ctx.fill();
+      const u = Math.min(255, Math.floor((1e3 - n.z) / 1e3 * 255)), x = Math.max(0.5, (1e3 - n.z) / 500 * 2);
+      this.ctx.beginPath(), this.ctx.moveTo(m, f), this.ctx.lineTo(r, h), this.ctx.strokeStyle = `rgba(${u}, ${u}, ${Math.min(255, u + 50)}, 0.8)`, this.ctx.lineWidth = x, this.ctx.stroke(), this.ctx.beginPath(), this.ctx.arc(r, h, x * 1.5, 0, Math.PI * 2), this.ctx.fillStyle = `rgb(${u}, ${u}, ${Math.min(255, u + 50)})`, this.ctx.fill();
     }
     this.animationId = requestAnimationFrame(() => this.animate());
   }
@@ -320,12 +330,13 @@ class A extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-class P extends c {
+d(M, "requiresText", !1);
+class z extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.imageData = null, this.time = 0, this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.scale = 4;
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "plasma-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "plasma-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "plasma-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "plasma-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .plasma-canvas {
@@ -363,8 +374,8 @@ class P extends c {
     const t = this.canvas.width, e = this.canvas.height, s = this.imageData.data, i = this.time;
     for (let n = 0; n < e; n++)
       for (let a = 0; a < t; a++) {
-        const r = Math.sin(a * 0.05 + i), o = Math.sin((n * 0.05 + i) * 0.5), l = Math.sin((a * 0.05 + n * 0.05 + i) * 0.5), f = Math.sin(Math.sqrt((a - t / 2) ** 2 + (n - e / 2) ** 2) * 0.05 + i), d = (r + o + l + f) / 4, m = Math.floor(Math.sin(d * Math.PI * 2) * 127 + 128), p = Math.floor(Math.sin(d * Math.PI * 2 + 2.094) * 127 + 128), S = Math.floor(Math.sin(d * Math.PI * 2 + 4.188) * 127 + 128), x = (n * t + a) * 4;
-        s[x] = m, s[x + 1] = p, s[x + 2] = S, s[x + 3] = 255;
+        const r = Math.sin(a * 0.05 + i), h = Math.sin((n * 0.05 + i) * 0.5), l = Math.sin((a * 0.05 + n * 0.05 + i) * 0.5), m = Math.sin(Math.sqrt((a - t / 2) ** 2 + (n - e / 2) ** 2) * 0.05 + i), f = (r + h + l + m) / 4, u = Math.floor(Math.sin(f * Math.PI * 2) * 127 + 128), x = Math.floor(Math.sin(f * Math.PI * 2 + 2.094) * 127 + 128), B = Math.floor(Math.sin(f * Math.PI * 2 + 4.188) * 127 + 128), v = (n * t + a) * 4;
+        s[v] = u, s[v + 1] = x, s[v + 2] = B, s[v + 3] = 255;
       }
     this.ctx.putImageData(this.imageData, 0, 0);
   }
@@ -379,7 +390,8 @@ class P extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const v = [
+d(z, "requiresText", !1);
+const g = [
   "#ff0000",
   "#ff7f00",
   "#ffff00",
@@ -391,12 +403,12 @@ const v = [
   "#ff69b4",
   "#ffd700"
 ];
-class L extends c {
+class _ extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.particles = [], this.rockets = [], this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.launchTimer = 0;
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "fireworks-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "fireworks-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "fireworks-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "fireworks-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .fireworks-canvas {
@@ -436,7 +448,7 @@ class L extends c {
       y: this.canvas.height,
       vx: (Math.random() - 0.5) * 2,
       vy: -(Math.random() * 4 + 8),
-      color: v[Math.floor(Math.random() * v.length)],
+      color: g[Math.floor(Math.random() * g.length)],
       targetY: Math.random() * this.canvas.height * 0.5 + 50
     });
   }
@@ -456,7 +468,7 @@ class L extends c {
     }
   }
   animate() {
-    const t = performance.now(), e = u(t, this.lastTime);
+    const t = performance.now(), e = p(t, this.lastTime);
     this.lastTime = t, this.ctx.fillStyle = "rgba(0, 0, 0, 0.15)", this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height), this.launchTimer += e * this.speed, this.launchTimer > 30 && (this.launchRocket(), this.launchTimer = 0);
     for (let s = this.rockets.length - 1; s >= 0; s--) {
       const i = this.rockets[s];
@@ -479,7 +491,8 @@ class L extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const B = 30, g = [
+d(_, "requiresText", !1);
+const X = 30, y = [
   "rgba(255, 100, 100, 0.3)",
   "rgba(100, 255, 100, 0.3)",
   "rgba(100, 100, 255, 0.3)",
@@ -487,12 +500,12 @@ const B = 30, g = [
   "rgba(255, 100, 255, 0.3)",
   "rgba(100, 255, 255, 0.3)"
 ];
-class D extends c {
+class k extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.bubbles = [], this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this);
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "bubbles-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "bubbles-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "bubbles-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "bubbles-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .bubbles-canvas {
@@ -527,7 +540,7 @@ class D extends c {
   }
   initBubbles() {
     this.bubbles = [];
-    for (let t = 0; t < B; t++)
+    for (let t = 0; t < X; t++)
       this.bubbles.push(this.createBubble());
   }
   createBubble(t = !1) {
@@ -538,7 +551,7 @@ class D extends c {
       radius: e,
       vx: (Math.random() - 0.5) * 0.5,
       vy: -(Math.random() * 1 + 0.5),
-      color: g[Math.floor(Math.random() * g.length)],
+      color: y[Math.floor(Math.random() * y.length)],
       wobbleOffset: Math.random() * Math.PI * 2,
       wobbleSpeed: Math.random() * 0.02 + 0.01
     };
@@ -560,7 +573,7 @@ class D extends c {
       this.drawBubble(t);
   }
   animate() {
-    const t = performance.now(), e = u(t, this.lastTime);
+    const t = performance.now(), e = p(t, this.lastTime);
     this.lastTime = t, this.ctx.fillStyle = "rgba(10, 20, 40, 1)", this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     for (let s = 0; s < this.bubbles.length; s++) {
       const i = this.bubbles[s];
@@ -575,7 +588,8 @@ class D extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const y = [
+d(k, "requiresText", !1);
+const w = [
   "#ff0000",
   "#00ff00",
   "#0000ff",
@@ -584,18 +598,18 @@ const y = [
   "#00ffff",
   "#ff8800",
   "#88ff00"
-], N = [
+], Y = [
   { dx: 1, dy: 0 },
   { dx: 0, dy: 1 },
   { dx: -1, dy: 0 },
   { dx: 0, dy: -1 }
 ];
-class $ extends c {
+class I extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.pipes = [], this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this), this.gridSize = 30, this.pipeWidth = 12, this.resetTimer = 0;
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "pipes-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "pipes-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "pipes-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "pipes-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .pipes-canvas {
@@ -638,7 +652,7 @@ class $ extends c {
       x: Math.floor(Math.random() * t) * this.gridSize + this.gridSize / 2,
       y: Math.floor(Math.random() * e) * this.gridSize + this.gridSize / 2,
       dir: Math.floor(Math.random() * 4),
-      color: y[Math.floor(Math.random() * y.length)],
+      color: w[Math.floor(Math.random() * w.length)],
       segments: 0,
       maxSegments: 50 + Math.floor(Math.random() * 100)
     });
@@ -655,8 +669,8 @@ class $ extends c {
     i.addColorStop(0, "#ffffff"), i.addColorStop(0.3, s), i.addColorStop(1, this.darkenColor(s, 0.5)), this.ctx.beginPath(), this.ctx.arc(t, e, this.pipeWidth, 0, Math.PI * 2), this.ctx.fillStyle = i, this.ctx.fill();
   }
   drawPipeSegment(t, e, s, i, n) {
-    const a = s - t, r = i - e, o = a !== 0, l = o ? this.ctx.createLinearGradient(t, e - this.pipeWidth, t, e + this.pipeWidth) : this.ctx.createLinearGradient(t - this.pipeWidth, e, t + this.pipeWidth, e);
-    l.addColorStop(0, "#ffffff"), l.addColorStop(0.3, n), l.addColorStop(0.7, n), l.addColorStop(1, this.darkenColor(n, 0.4)), this.ctx.beginPath(), o ? this.ctx.rect(
+    const a = s - t, r = i - e, h = a !== 0, l = h ? this.ctx.createLinearGradient(t, e - this.pipeWidth, t, e + this.pipeWidth) : this.ctx.createLinearGradient(t - this.pipeWidth, e, t + this.pipeWidth, e);
+    l.addColorStop(0, "#ffffff"), l.addColorStop(0.3, n), l.addColorStop(0.7, n), l.addColorStop(1, this.darkenColor(n, 0.4)), this.ctx.beginPath(), h ? this.ctx.rect(
       Math.min(t, s) - 2,
       e - this.pipeWidth / 2,
       Math.abs(a) + 4,
@@ -674,7 +688,7 @@ class $ extends c {
   }
   updatePipes(t) {
     for (let e = this.pipes.length - 1; e >= 0; e--) {
-      const s = this.pipes[e], i = N[s.dir], n = s.x + i.dx * this.gridSize, a = s.y + i.dy * this.gridSize;
+      const s = this.pipes[e], i = Y[s.dir], n = s.x + i.dx * this.gridSize, a = s.y + i.dy * this.gridSize;
       if (this.drawPipeSegment(s.x, s.y, n, a, s.color), this.drawJoint(n, a, s.color), s.x = n, s.y = a, s.segments++, s.segments >= s.maxSegments || n < 0 || n > this.canvas.width || a < 0 || a > this.canvas.height) {
         this.pipes.splice(e, 1), this.addPipe();
         continue;
@@ -686,7 +700,7 @@ class $ extends c {
     }
   }
   animate() {
-    const t = performance.now(), e = u(t, this.lastTime);
+    const t = performance.now(), e = p(t, this.lastTime);
     this.lastTime = t, this.pipes.length < 3 && Math.random() < 0.02 && this.addPipe(), this.updatePipes(e), this.resetTimer += e * this.speed, this.resetTimer > 500 && (this.initPipes(), this.resetTimer = 0), this.animationId = requestAnimationFrame(() => this.animate());
   }
   destroy() {
@@ -696,13 +710,14 @@ class $ extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const w = ["#ff0088", "#00ff88", "#8800ff", "#ff8800"], F = 4, W = 20;
-class G extends c {
+d(I, "requiresText", !1);
+const b = ["#ff0088", "#00ff88", "#8800ff", "#ff8800"], Z = 4, J = 20;
+class R extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.polygons = [], this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this);
   }
   start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "mystify-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.textOverlay = document.createElement("div"), this.textOverlay.className = "mystify-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "mystify-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "mystify-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .mystify-canvas {
@@ -739,7 +754,7 @@ class G extends c {
     this.polygons = [];
     for (let t = 0; t < 2; t++) {
       const e = [];
-      for (let s = 0; s < F; s++)
+      for (let s = 0; s < Z; s++)
         e.push({
           x: Math.random() * this.canvas.width,
           y: Math.random() * this.canvas.height,
@@ -749,7 +764,7 @@ class G extends c {
         });
       this.polygons.push({
         vertices: e,
-        color: w[t % w.length]
+        color: b[t % b.length]
       });
     }
   }
@@ -773,11 +788,11 @@ class G extends c {
     }
   }
   animate() {
-    const t = performance.now(), e = u(t, this.lastTime);
+    const t = performance.now(), e = p(t, this.lastTime);
     this.lastTime = t;
     for (const s of this.polygons)
       for (const i of s.vertices)
-        i.history.push({ x: i.x, y: i.y }), i.history.length > W && i.history.shift(), i.x += i.vx * e * this.speed, i.y += i.vy * e * this.speed, (i.x <= 0 || i.x >= this.canvas.width) && (i.vx *= -1, i.x = Math.max(0, Math.min(this.canvas.width, i.x))), (i.y <= 0 || i.y >= this.canvas.height) && (i.vy *= -1, i.y = Math.max(0, Math.min(this.canvas.height, i.y)));
+        i.history.push({ x: i.x, y: i.y }), i.history.length > J && i.history.shift(), i.x += i.vx * e * this.speed, i.y += i.vy * e * this.speed, (i.x <= 0 || i.x >= this.canvas.width) && (i.vx *= -1, i.x = Math.max(0, Math.min(this.canvas.width, i.x))), (i.y <= 0 || i.y >= this.canvas.height) && (i.vy *= -1, i.y = Math.max(0, Math.min(this.canvas.height, i.y)));
     this.drawFrame(), this.animationId = requestAnimationFrame(() => this.animate());
   }
   destroy() {
@@ -787,13 +802,14 @@ class G extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const q = "https://unpkg.com/three@0.160.0/build/three.module.js";
-class H extends c {
+d(R, "requiresText", !1);
+const V = "https://unpkg.com/three@0.160.0/build/three.module.js";
+class O extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.textOverlay = null, this.THREE = null, this.scene = null, this.camera = null, this.renderer = null, this.tunnel = null, this.lastTime = 0, this._boundResize = this.resize.bind(this);
   }
   async start() {
-    this.canvas = document.createElement("canvas"), this.canvas.className = "tunnel-canvas", this.container.appendChild(this.canvas), this.textOverlay = document.createElement("div"), this.textOverlay.className = "tunnel-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.canvas = document.createElement("canvas"), this.canvas.className = "tunnel-canvas", this.container.appendChild(this.canvas), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "tunnel-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     t.textContent = `
       .tunnel-canvas {
@@ -831,7 +847,7 @@ class H extends c {
     try {
       if (this.THREE = await import(
         /* webpackIgnore: true */
-        q
+        V
       ), e.remove(), this.reducedMotion) {
         this.setupStaticScene();
         return;
@@ -853,18 +869,18 @@ class H extends c {
     const t = this.THREE;
     this.tunnelSegments = [];
     const e = 30, s = 2;
-    for (let o = 0; o < e; o++) {
-      const l = new t.TorusGeometry(3, 0.05, 8, 32), f = new t.MeshBasicMaterial({
-        color: new t.Color().setHSL(o / e, 1, 0.5),
+    for (let h = 0; h < e; h++) {
+      const l = new t.TorusGeometry(3, 0.05, 8, 32), m = new t.MeshBasicMaterial({
+        color: new t.Color().setHSL(h / e, 1, 0.5),
         transparent: !0,
         opacity: 0.8
-      }), d = new t.Mesh(l, f);
-      d.position.z = -o * s, d.rotation.x = Math.PI / 2, this.scene.add(d), this.tunnelSegments.push(d);
+      }), f = new t.Mesh(l, m);
+      f.position.z = -h * s, f.rotation.x = Math.PI / 2, this.scene.add(f), this.tunnelSegments.push(f);
     }
     const i = 500, n = new t.BufferGeometry(), a = new Float32Array(i * 3);
-    for (let o = 0; o < i; o++) {
-      const l = Math.random() * Math.PI * 2, f = Math.random() * 2.5;
-      a[o * 3] = Math.cos(l) * f, a[o * 3 + 1] = Math.sin(l) * f, a[o * 3 + 2] = Math.random() * -60;
+    for (let h = 0; h < i; h++) {
+      const l = Math.random() * Math.PI * 2, m = Math.random() * 2.5;
+      a[h * 3] = Math.cos(l) * m, a[h * 3 + 1] = Math.sin(l) * m, a[h * 3 + 2] = Math.random() * -60;
     }
     n.setAttribute("position", new t.BufferAttribute(a, 3));
     const r = new t.PointsMaterial({
@@ -908,7 +924,8 @@ class H extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const b = [
+d(O, "requiresText", !1);
+const C = [
   // Purple gradient
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23667eea'/%3E%3Cstop offset='100%25' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='600'/%3E%3C/svg%3E",
   // Pink gradient
@@ -918,12 +935,12 @@ const b = [
   // Green gradient
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2343e97b'/%3E%3Cstop offset='100%25' stop-color='%2338f9d7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='600'/%3E%3C/svg%3E"
 ];
-class U extends c {
+class A extends c {
   constructor(t, e, s) {
     super(t, e, s), this.images = [], this.loadedImages = [], this.currentIndex = 0, this.currentSlide = null, this.nextSlide = null, this.textOverlay = null, this.slideDuration = 5e3, this.transitionDuration = 1e3, this.slideTimer = null, this.lastTime = 0;
   }
   start() {
-    this.parseConfig(), this.wrapper = document.createElement("div"), this.wrapper.className = "slideshow-wrapper", this.container.appendChild(this.wrapper), this.currentSlide = document.createElement("div"), this.currentSlide.className = "slideshow-slide", this.wrapper.appendChild(this.currentSlide), this.nextSlide = document.createElement("div"), this.nextSlide.className = "slideshow-slide slideshow-next", this.wrapper.appendChild(this.nextSlide), this.textOverlay = document.createElement("div"), this.textOverlay.className = "slideshow-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.parseConfig(), this.wrapper = document.createElement("div"), this.wrapper.className = "slideshow-wrapper", this.container.appendChild(this.wrapper), this.currentSlide = document.createElement("div"), this.currentSlide.className = "slideshow-slide", this.wrapper.appendChild(this.currentSlide), this.nextSlide = document.createElement("div"), this.nextSlide.className = "slideshow-slide slideshow-next", this.wrapper.appendChild(this.nextSlide), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "slideshow-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     t.textContent = `
       .slideshow-wrapper {
@@ -979,7 +996,7 @@ class U extends c {
         font-size: 0.8rem;
       }
     `, this.container.appendChild(t), this.preloadImages().then(() => {
-      this.loadedImages.length === 0 && (console.warn("Slideshow: No images loaded, using defaults"), this.loadedImages = b), this.showSlide(0), this.reducedMotion || this.startSlideTimer();
+      this.loadedImages.length === 0 && (console.warn("Slideshow: No images loaded, using defaults"), this.loadedImages = C), this.showSlide(0), this.reducedMotion || this.startSlideTimer();
     });
   }
   parseConfig() {
@@ -993,7 +1010,7 @@ class U extends c {
       const n = t.getAttribute("data-transition");
       n && (this.transitionDuration = parseInt(n, 10));
     }
-    this.images.length === 0 && (this.images = b);
+    this.images.length === 0 && (this.images = C);
   }
   async preloadImages() {
     const t = document.createElement("div");
@@ -1034,13 +1051,14 @@ class U extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const X = "linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%)";
-class Y extends c {
+d(A, "requiresText", !1);
+const K = "linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%)";
+class L extends c {
   constructor(t, e, s) {
     super(t, e, s), this.canvas = null, this.ctx = null, this.snowflakes = [], this.snowflakeCount = 200, this.wind = 0, this.windTarget = 0, this.backgroundUrl = null, this.lastTime = 0, this.textOverlay = null, this._boundResize = this.resize.bind(this);
   }
   start() {
-    this.parseConfig(), this.backgroundLayer = document.createElement("div"), this.backgroundLayer.className = "snow-background", this.container.appendChild(this.backgroundLayer), this.canvas = document.createElement("canvas"), this.canvas.className = "snow-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.groundLayer = document.createElement("div"), this.groundLayer.className = "snow-ground", this.container.appendChild(this.groundLayer), this.textOverlay = document.createElement("div"), this.textOverlay.className = "snow-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay);
+    this.parseConfig(), this.backgroundLayer = document.createElement("div"), this.backgroundLayer.className = "snow-background", this.container.appendChild(this.backgroundLayer), this.canvas = document.createElement("canvas"), this.canvas.className = "snow-canvas", this.container.appendChild(this.canvas), this.ctx = this.canvas.getContext("2d"), this.groundLayer = document.createElement("div"), this.groundLayer.className = "snow-ground", this.container.appendChild(this.groundLayer), this.text && (this.textOverlay = document.createElement("div"), this.textOverlay.className = "snow-text", this.textOverlay.textContent = this.text, this.container.appendChild(this.textOverlay));
     const t = document.createElement("style");
     if (t.textContent = `
       .snow-background {
@@ -1049,7 +1067,7 @@ class Y extends c {
         left: 0;
         width: 100%;
         height: 100%;
-        background: ${this.backgroundUrl ? `url(${this.backgroundUrl})` : X};
+        background: ${this.backgroundUrl ? `url(${this.backgroundUrl})` : K};
         background-size: cover;
         background-position: center;
       }
@@ -1145,29 +1163,30 @@ class Y extends c {
     super.updateText(t), this.textOverlay && (this.textOverlay.textContent = t);
   }
 }
-const Z = {
+d(L, "requiresText", !1);
+const j = {
   // Basic effects
-  bounce3d: E,
-  matrix: k,
-  "ascii-glitch": R,
-  starfield: A,
-  plasma: P,
-  fireworks: L,
-  bubbles: D,
-  pipes: $,
-  mystify: G,
+  bounce3d: S,
+  matrix: W,
+  "ascii-glitch": H,
+  starfield: M,
+  plasma: z,
+  fireworks: _,
+  bubbles: k,
+  pipes: I,
+  mystify: R,
   // Advanced effects
-  tunnel: H,
-  slideshow: U,
-  snow: Y
-}, T = new Map(Object.entries(Z));
-function J(h, t) {
-  T.set(h, t);
+  tunnel: O,
+  slideshow: A,
+  snow: L
+}, P = new Map(Object.entries(j));
+function Q(o, t) {
+  P.set(o, t);
 }
-function V(h) {
-  return T.get(h) || E;
+function E(o) {
+  return P.get(o) || S;
 }
-class K extends HTMLElement {
+class tt extends HTMLElement {
   static get observedAttributes() {
     return ["timeout", "effect", "speed", "background"];
   }
@@ -1177,7 +1196,7 @@ class K extends HTMLElement {
    * @param {typeof Effect} effectClass - Effect class extending Effect
    */
   static registerEffect(t, e) {
-    J(t, e);
+    Q(t, e);
   }
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this._isActive = !1, this._idleTimer = null, this._activatedAt = null, this._effect = null, this._boundResetTimer = this._resetIdleTimer.bind(this), this._boundDismiss = this._handleDismiss.bind(this), this._boundSlotChange = this._handleSlotChange.bind(this), this._slotElement = null;
@@ -1287,10 +1306,19 @@ class K extends HTMLElement {
     `, this._slotElement = this.shadowRoot.querySelector("slot"), this._slotElement.addEventListener("slotchange", this._boundSlotChange);
   }
   _getSlotText() {
-    return this.shadowRoot.querySelector("slot").assignedNodes({ flatten: !0 }).map((s) => s.textContent).join("").trim() || "Screen Saver";
+    return this.shadowRoot.querySelector("slot").assignedNodes({ flatten: !0 }).map((s) => s.textContent).join("").trim();
+  }
+  /**
+   * Get the text to display based on effect requirements.
+   * @param {typeof Effect} EffectClass - The effect class
+   * @returns {string|null} Text to display, or null if not needed
+   */
+  _getTextForEffect(t) {
+    const e = this._getSlotText();
+    return e || (t.requiresText ? window.location.hostname || "Screen Saver" : null);
   }
   _createEffect() {
-    const t = this.shadowRoot.querySelector(".effect-container"), e = V(this.effect), s = this._getSlotText();
+    const t = this.shadowRoot.querySelector(".effect-container"), e = E(this.effect), s = this._getTextForEffect(e);
     this._effect = new e(t, s, this.speed), this._effect.start();
   }
   _destroyEffect() {
@@ -1334,26 +1362,26 @@ class K extends HTMLElement {
   }
   _handleSlotChange() {
     if (!this._isActive || !this._effect) return;
-    const t = this._getSlotText();
-    typeof this._effect.updateText == "function" && this._effect.updateText(t);
+    const t = E(this.effect), e = this._getTextForEffect(t);
+    typeof this._effect.updateText == "function" && this._effect.updateText(e);
   }
 }
-customElements.define("screen-saver", K);
+customElements.define("screen-saver", tt);
 export {
-  R as AsciiGlitchEffect,
-  E as Bounce3DEffect,
-  D as BubblesEffect,
+  H as AsciiGlitchEffect,
+  S as Bounce3DEffect,
+  k as BubblesEffect,
   c as Effect,
-  L as FireworksEffect,
-  k as MatrixEffect,
-  G as MystifyEffect,
-  $ as PipesEffect,
-  P as PlasmaEffect,
-  K as ScreenSaver,
-  U as SlideshowEffect,
-  Y as SnowEffect,
-  A as StarfieldEffect,
-  H as TunnelEffect,
-  K as default
+  _ as FireworksEffect,
+  W as MatrixEffect,
+  R as MystifyEffect,
+  I as PipesEffect,
+  z as PlasmaEffect,
+  tt as ScreenSaver,
+  A as SlideshowEffect,
+  L as SnowEffect,
+  M as StarfieldEffect,
+  O as TunnelEffect,
+  tt as default
 };
 //# sourceMappingURL=screen-saver.js.map

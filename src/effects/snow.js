@@ -24,6 +24,8 @@ const DEFAULT_BACKGROUND = 'linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, 
  * Snow scene effect with parallax layers and optional background.
  */
 class SnowEffect extends Effect {
+  static requiresText = false;
+
   constructor(container, text, speed) {
     super(container, text, speed);
     this.canvas = null;
@@ -57,11 +59,13 @@ class SnowEffect extends Effect {
     this.groundLayer.className = 'snow-ground';
     this.container.appendChild(this.groundLayer);
 
-    // Create text overlay
-    this.textOverlay = document.createElement('div');
-    this.textOverlay.className = 'snow-text';
-    this.textOverlay.textContent = this.text;
-    this.container.appendChild(this.textOverlay);
+    // Create text overlay (only if text is provided)
+    if (this.text) {
+      this.textOverlay = document.createElement('div');
+      this.textOverlay.className = 'snow-text';
+      this.textOverlay.textContent = this.text;
+      this.container.appendChild(this.textOverlay);
+    }
 
     // Add styles
     const style = document.createElement('style');

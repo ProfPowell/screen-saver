@@ -19,6 +19,8 @@ const TRAIL_LENGTH = 20;
  * Canvas-based with colorful polygon trails.
  */
 class MystifyEffect extends Effect {
+  static requiresText = false;
+
   constructor(container, text, speed) {
     super(container, text, speed);
     this.canvas = null;
@@ -35,10 +37,12 @@ class MystifyEffect extends Effect {
     this.container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
 
-    this.textOverlay = document.createElement('div');
-    this.textOverlay.className = 'mystify-text';
-    this.textOverlay.textContent = this.text;
-    this.container.appendChild(this.textOverlay);
+    if (this.text) {
+      this.textOverlay = document.createElement('div');
+      this.textOverlay.className = 'mystify-text';
+      this.textOverlay.textContent = this.text;
+      this.container.appendChild(this.textOverlay);
+    }
 
     const style = document.createElement('style');
     style.textContent = `

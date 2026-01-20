@@ -34,6 +34,8 @@ const DEFAULT_IMAGES = [
  * Images can be configured via data-images attribute.
  */
 class SlideshowEffect extends Effect {
+  static requiresText = false;
+
   constructor(container, text, speed) {
     super(container, text, speed);
     this.images = [];
@@ -66,11 +68,13 @@ class SlideshowEffect extends Effect {
     this.nextSlide.className = 'slideshow-slide slideshow-next';
     this.wrapper.appendChild(this.nextSlide);
 
-    // Create text overlay
-    this.textOverlay = document.createElement('div');
-    this.textOverlay.className = 'slideshow-text';
-    this.textOverlay.textContent = this.text;
-    this.container.appendChild(this.textOverlay);
+    // Create text overlay (only if text is provided)
+    if (this.text) {
+      this.textOverlay = document.createElement('div');
+      this.textOverlay.className = 'slideshow-text';
+      this.textOverlay.textContent = this.text;
+      this.container.appendChild(this.textOverlay);
+    }
 
     // Add styles
     const style = document.createElement('style');

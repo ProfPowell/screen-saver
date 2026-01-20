@@ -10,8 +10,16 @@ import { prefersReducedMotion } from './utils/reduced-motion.js';
  */
 class Effect {
   /**
+   * Whether this effect requires text to be displayed.
+   * If true and no text is provided, defaults to the site's domain name.
+   * If false, the effect runs without text overlay.
+   * @type {boolean}
+   */
+  static requiresText = true;
+
+  /**
    * @param {HTMLElement} container - The container element to render into
-   * @param {string} text - The text to display
+   * @param {string|null} text - The text to display (null if not required)
    * @param {number} speed - Animation speed multiplier
    */
   constructor(container, text, speed) {

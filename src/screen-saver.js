@@ -227,13 +227,36 @@ class ScreenSaver extends HTMLElement {
   _getSlotText() {
     const slot = this.shadowRoot.querySelector('slot');
     const nodes = slot.assignedNodes({ flatten: true });
-    return nodes.map(node => node.textContent).join('').trim() || 'Screen Saver';
+    return nodes.map(node => node.textContent).join('').trim();
+  }
+
+  /**
+   * Get the text to display based on effect requirements.
+   * @param {typeof Effect} EffectClass - The effect class
+   * @returns {string|null} Text to display, or null if not needed
+   */
+  _getTextForEffect(EffectClass) {
+    const slotText = this._getSlotText();
+
+    // If slot has text, always use it
+    if (slotText) {
+      return slotText;
+    }
+
+    // Check if effect requires text
+    if (EffectClass.requiresText) {
+      // Default to the site's domain name
+      return window.location.hostname || 'Screen Saver';
+    }
+
+    // Effect doesn't require text
+    return null;
   }
 
   _createEffect() {
     const container = this.shadowRoot.querySelector('.effect-container');
     const EffectClass = getEffect(this.effect);
-    const text = this._getSlotText();
+    const text = this._getTextForEffect(EffectClass);
 
     this._effect = new EffectClass(container, text, this.speed);
     this._effect.start();
@@ -320,7 +343,8 @@ class ScreenSaver extends HTMLElement {
 
   _handleSlotChange() {
     if (!this._isActive || !this._effect) return;
-    const text = this._getSlotText();
+    const EffectClass = getEffect(this.effect);
+    const text = this._getTextForEffect(EffectClass);
     if (typeof this._effect.updateText === 'function') {
       this._effect.updateText(text);
     }

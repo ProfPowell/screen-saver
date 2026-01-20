@@ -15,6 +15,8 @@ const THREE_CDN = 'https://unpkg.com/three@0.160.0/build/three.module.js';
  * Dynamically loads Three.js from CDN on first use.
  */
 class TunnelEffect extends Effect {
+  static requiresText = false;
+
   constructor(container, text, speed) {
     super(container, text, speed);
     this.canvas = null;
@@ -34,11 +36,13 @@ class TunnelEffect extends Effect {
     this.canvas.className = 'tunnel-canvas';
     this.container.appendChild(this.canvas);
 
-    // Create text overlay
-    this.textOverlay = document.createElement('div');
-    this.textOverlay.className = 'tunnel-text';
-    this.textOverlay.textContent = this.text;
-    this.container.appendChild(this.textOverlay);
+    // Create text overlay (only if text is provided)
+    if (this.text) {
+      this.textOverlay = document.createElement('div');
+      this.textOverlay.className = 'tunnel-text';
+      this.textOverlay.textContent = this.text;
+      this.container.appendChild(this.textOverlay);
+    }
 
     // Add styles
     const style = document.createElement('style');

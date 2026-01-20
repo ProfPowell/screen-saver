@@ -9,6 +9,8 @@ import { Effect } from '../effect.js';
  * Canvas-based with sine wave color patterns.
  */
 class PlasmaEffect extends Effect {
+  static requiresText = false;
+
   constructor(container, text, speed) {
     super(container, text, speed);
     this.canvas = null;
@@ -28,11 +30,13 @@ class PlasmaEffect extends Effect {
     this.container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
 
-    // Create centered text overlay
-    this.textOverlay = document.createElement('div');
-    this.textOverlay.className = 'plasma-text';
-    this.textOverlay.textContent = this.text;
-    this.container.appendChild(this.textOverlay);
+    // Create centered text overlay (only if text is provided)
+    if (this.text) {
+      this.textOverlay = document.createElement('div');
+      this.textOverlay.className = 'plasma-text';
+      this.textOverlay.textContent = this.text;
+      this.container.appendChild(this.textOverlay);
+    }
 
     // Add styles
     const style = document.createElement('style');

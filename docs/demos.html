@@ -58,9 +58,22 @@
         <label>
           Effect:
           <select id="effectSelect">
-            <option value="bounce3d">bounce3d</option>
-            <option value="matrix">matrix</option>
-            <option value="ascii-glitch">ascii-glitch</option>
+            <optgroup label="Basic Effects">
+              <option value="bounce3d">bounce3d</option>
+              <option value="matrix">matrix</option>
+              <option value="ascii-glitch">ascii-glitch</option>
+              <option value="starfield">starfield</option>
+              <option value="plasma">plasma</option>
+              <option value="fireworks">fireworks</option>
+              <option value="bubbles">bubbles</option>
+              <option value="pipes">pipes</option>
+              <option value="mystify">mystify</option>
+            </optgroup>
+            <optgroup label="Advanced Effects">
+              <option value="tunnel">tunnel (Three.js)</option>
+              <option value="slideshow">slideshow</option>
+              <option value="snow">snow</option>
+            </optgroup>
           </select>
         </label>
         <label>
@@ -95,6 +108,85 @@
         <p>Cyberpunk-style glitch effect with character corruption and chromatic aberration.</p>
         <button class="btn btn-secondary" data-effect="ascii-glitch">Try It</button>
       </div>
+
+      <div class="card">
+        <h3>starfield</h3>
+        <p>Classic flying through space effect with streaming stars and warp speed trails.</p>
+        <button class="btn btn-secondary" data-effect="starfield">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>plasma</h3>
+        <p>Retro plasma waves with smooth colorful gradients, reminiscent of 90s demos.</p>
+        <button class="btn btn-secondary" data-effect="plasma">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>fireworks</h3>
+        <p>Colorful particle explosions lighting up the night sky with rocket trails.</p>
+        <button class="btn btn-secondary" data-effect="fireworks">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>bubbles</h3>
+        <p>Relaxing translucent bubbles floating gently upward with gradient shading.</p>
+        <button class="btn btn-secondary" data-effect="bubbles">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>pipes</h3>
+        <p>Classic Windows 3D pipes growing and turning across the screen.</p>
+        <button class="btn btn-secondary" data-effect="pipes">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>mystify</h3>
+        <p>Windows Mystify with bouncing polygons leaving colorful trailing lines.</p>
+        <button class="btn btn-secondary" data-effect="mystify">Try It</button>
+      </div>
+    </div>
+
+    <h2>Advanced Effects</h2>
+    <p>These effects demonstrate advanced features like external dependencies, configurable images, and scene composition.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>tunnel <span style="color: var(--accent-color); font-size: 0.8em;">(Three.js)</span></h3>
+        <p>3D wireframe tunnel using Three.js, loaded dynamically from CDN. Demonstrates external dependency management.</p>
+        <button class="btn btn-secondary" data-effect="tunnel">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>slideshow</h3>
+        <p>Ken Burns crossfade slideshow with configurable images via <code>data-images</code> attribute.</p>
+        <button class="btn btn-secondary" data-effect="slideshow">Try It</button>
+      </div>
+
+      <div class="card">
+        <h3>snow</h3>
+        <p>Peaceful falling snow with parallax layers, wind simulation, and configurable background.</p>
+        <button class="btn btn-secondary" data-effect="snow">Try It</button>
+      </div>
+    </div>
+
+    <h2>Advanced Effect Configuration</h2>
+    <div class="card">
+      <p>Advanced effects support data attributes for configuration:</p>
+      <code-block language="html" theme="dark">&lt;!-- Slideshow with custom images --&gt;
+&lt;screen-saver effect="slideshow"
+  data-images="photo1.jpg,photo2.jpg,photo3.jpg"
+  data-duration="5000"
+  data-transition="1000"&gt;
+  My Photos
+&lt;/screen-saver&gt;
+
+&lt;!-- Snow with custom background --&gt;
+&lt;screen-saver effect="snow"
+  data-background="winter-cabin.jpg"
+  data-snowflakes="300"
+  data-wind="0.5"&gt;
+  Let it Snow
+&lt;/screen-saver&gt;</code-block>
     </div>
 
     <h2>CSS Customization</h2>
@@ -114,6 +206,12 @@
       <p>The component automatically respects <code>prefers-reduced-motion</code>. When enabled, all effects display static centered text without animation.</p>
       <p>To test, enable "Reduce motion" in your system accessibility settings.</p>
     </div>
+
+    <h2>Live Slot Updates</h2>
+    <div class="card">
+      <p>Click the button to push a live clock into the slot while the screen saver is active.</p>
+      <button id="clockBtn" class="btn">Start Live Clock</button>
+    </div>
   </main>
 
   <footer>
@@ -131,6 +229,8 @@
     const textInput = document.getElementById('textInput');
     const speedSlider = document.getElementById('speedSlider');
     const speedValue = document.getElementById('speedValue');
+    const clockBtn = document.getElementById('clockBtn');
+    let clockInterval = null;
 
     // Update effect
     effectSelect.addEventListener('change', () => {
@@ -147,6 +247,26 @@
       const speed = parseFloat(speedSlider.value);
       screensaver.speed = speed;
       speedValue.textContent = speed.toFixed(1) + 'x';
+    });
+
+    // Live clock updates
+    clockBtn.addEventListener('click', () => {
+      if (clockInterval) {
+        clearInterval(clockInterval);
+        clockInterval = null;
+        clockBtn.textContent = 'Start Live Clock';
+        return;
+      }
+
+      const updateClock = () => {
+        const text = new Date().toLocaleString();
+        screensaver.textContent = text;
+        textInput.value = text;
+      };
+
+      updateClock();
+      clockInterval = setInterval(updateClock, 1000);
+      clockBtn.textContent = 'Stop Live Clock';
     });
 
     // Main activate button
